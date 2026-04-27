@@ -3,6 +3,6 @@ terraform {
     bucket         = "digi-dev-tf-s3-bucket"
     key            = "eks/dev/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "eks-lock-dev"
+    dynamodb_table = "digi-dev-tf-lock-state"
   }
 }
