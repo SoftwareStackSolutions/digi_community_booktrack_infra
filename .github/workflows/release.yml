@@ -1,4 +1,4 @@
-name: Production Release
+name: Development Release
 
 on:
   push:
@@ -15,27 +15,56 @@ jobs:
 
     steps:
 
+      # CHECKOUT
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # READ VERSION
-      - name: Read Version
+      # FETCH TAGS
+      - name: Fetch Tags
+        run: |
+          git fetch --tags
+
+      # GENERATE VERSION
+      - name: Generate Version
         id: version
         run: |
-          VERSION=$(cat version.txt)
 
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
+
+          echo "Latest Tag: $LATEST_TAG"
+
+          if [ -z "$LATEST_TAG" ]; then
+
+            NEW_VERSION="v1.0.0"
+
+          else
+
+            MAJOR=$(echo $LATEST_TAG | cut -d. -f1 | tr -d 'v')
+            MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+            PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+
+            PATCH=$((PATCH + 1))
+
+            NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+
+          fi
+
+          echo "Generated Version: $NEW_VERSION"
+
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       # CREATE TAG
       - name: Create Git Tag
         run: |
 
+          VERSION=${{ steps.version.outputs.version }}
+
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          git tag ${{ steps.version.outputs.version }}
+          git tag $VERSION
 
-          git push origin ${{ steps.version.outputs.version }}
+          git push origin $VERSION
 
       # CREATE RELEASE
       - name: Create GitHub Release
@@ -58,4 +87,4 @@ jobs:
             - Kubernetes deployment updated
             - Docker image published
 
-            Thanks to all contributors 
+            Thanks to all contributors 🚀
