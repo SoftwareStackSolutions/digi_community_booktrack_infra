@@ -1,9 +1,9 @@
-name: Terraform EKS CI/CD
+name: Terraform EKS CI/CD For Acceptance
 
 on:
   push:
     branches:
-      - main
+      - acceptance
 
 permissions:
   id-token: write
@@ -83,11 +83,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        working-directory: pillars/dev
+        working-directory: pillars/acc
         run: terraform init -upgrade
 
       - name: Terraform Plan
-        working-directory: pillars/dev
+        working-directory: pillars/acc
         run: |
           CLEAN_VERSION=$(echo "${{ needs.versioning.outputs.version }}" | sed 's/^v//' | tr '.' '-')
           terraform plan \
