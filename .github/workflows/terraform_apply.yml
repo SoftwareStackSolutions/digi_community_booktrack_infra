@@ -3,7 +3,7 @@ name: Terraform EKS CI/CD
 on:
   push:
     branches:
-      - main
+      - production
 
 permissions:
   id-token: write
@@ -83,11 +83,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        working-directory: pillars/dev
+        working-directory: pillars/prod
         run: terraform init -upgrade
 
       - name: Terraform Plan
-        working-directory: pillars/dev
+        working-directory: pillars/prod
         run: |
           CLEAN_VERSION=$(echo "${{ needs.versioning.outputs.version }}" | sed 's/^v//' | tr '.' '-')
           terraform plan \
